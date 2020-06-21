@@ -1,3 +1,4 @@
+import { MenuLoginComponent } from './menu-login/menu-login.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -15,12 +16,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   ],
   declarations: [
     MenuComponent,
+    MenuLoginComponent,
     HomeComponent,
     FooterComponent,
     NotFoundComponent
   ],
   exports: [
     MenuComponent,
+    MenuLoginComponent,
     HomeComponent,
     FooterComponent,
     NotFoundComponent

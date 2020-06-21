@@ -1,3 +1,4 @@
+import { ContaGuard } from './services/conta.guard';
 import { LoginComponent } from './login/login.component';
 import { CadastroComponent } from './cadastro/cadastro.component';
 import { ContaAppComponent } from './conta.app.component';
@@ -10,11 +11,15 @@ const contaRouterConfig: Routes = [
     children: [
       {
         path: 'cadastro',
-        component: CadastroComponent
+        component: CadastroComponent,
+        canDeactivate: [ContaGuard],
+        canActivate: [ContaGuard]
       },
       {
         path: 'login',
-        component: LoginComponent
+        component: LoginComponent,
+        canActivate: [ContaGuard]
+
       }
     ]
   }

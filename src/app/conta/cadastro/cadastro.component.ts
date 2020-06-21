@@ -5,6 +5,8 @@ import { Component, OnInit, AfterViewInit, ElementRef, ViewChildren } from '@ang
 import { FormBuilder, FormGroup, Validators, FormControl, FormControlName } from '@angular/forms';
 import { CustomValidators } from 'ngx-custom-validators';
 import { Observable, merge, fromEvent } from 'rxjs';
+import { ToastrService } from 'ngx-toastr'
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-cadastro',
   templateUrl: './cadastro.component.html',
@@ -21,8 +23,12 @@ export class CadastroComponent implements OnInit, AfterViewInit {
   genericValidator: GenericValidator;
   displayMessage: DisplayMessage = {};
 
+  mudancasNaoSalvas: boolean;
+
   constructor(private fb:FormBuilder,
-              private contaService: ContaService) {
+              private contaService: ContaService,
+              private router: Router,
+              private toastr: ToastrService) {
     this.validationMessages =  {
       email: {
         required: 'Informe o e-mail',
@@ -60,15 +66,44 @@ export class CadastroComponent implements OnInit, AfterViewInit {
 
     merge(...controlBlurs).subscribe(()=>{
       this.displayMessage = this.genericValidator.processarMensagens(this.cadastroForm);
-//       this.mudancasNaoSalvas = true;
+      this.mudancasNaoSalvas = true;
     });
   }
 
   registrarConta() {
     if(this.cadastroForm.dirty && this.cadastroForm.valid) {
       this.usuario = Object.assign({}, this.usuario, this.cadastroForm.value);
-      this.contaService.registrarUsuario(this.usuario);
+      this.contaService
+        .registrarUsuario(this.usuario)
+          .subscribe(
+            sucesso => {this.processarSucesso(sucesso)},
+            falha => {this.processarFalha(falha)},
+          );
+      this.mudancasNaoSalvas = false;
     }
+  }
+
+  processarSucesso(response: any) {
+
+    this.cadastroForm.reset();
+    this.errors = [];
+
+    this.contaService.LocalStorage.salvarDadosLocaisUsuario(response);
+
+
+    let toast = this.toastr.success('Registro realizado com Sucesso!', 'Bem vindo!!!');
+    if(toast){
+      toast.onHidden.subscribe(() => {
+        this.router.navigate(['/home']);
+      });
+    }
+
+  }
+
+  processarFalha(fail: any){
+    this.toastr.error('Ocorreu um erro!', 'Opa :(');
+
+    this.errors = fail.error.errors;
   }
 
 }
